@@ -18,6 +18,7 @@
         <module>lemon-admin</module>
         <module>lemon-common</module>
         <module>lemon-framework</module>
+        <module>lemon-system</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -152,6 +153,13 @@
             <dependency>
                 <groupId>com.lemon</groupId>
                 <artifactId>lemon-framework</artifactId>
+                <version>${lemon-ruoyi.version}</version>
+            </dependency>
+
+            <!-- 系统模块-->
+            <dependency>
+                <groupId>com.lemon</groupId>
+                <artifactId>lemon-system</artifactId>
                 <version>${lemon-ruoyi.version}</version>
             </dependency>
         </dependencies>

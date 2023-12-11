@@ -34,6 +34,13 @@
             <artifactId>lemon-framework</artifactId>
         </dependency>
 
+        <!-- 系统模块-->
+        <dependency>
+            <groupId>com.lemon</groupId>
+            <artifactId>lemon-system</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
