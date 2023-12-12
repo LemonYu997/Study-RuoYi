@@ -1,5 +1,6 @@
 package com.lemon.controller.system;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.lemon.common.constant.Constants;
 import com.lemon.common.core.domain.R;
 import com.lemon.common.core.domain.model.LoginBody;
@@ -24,6 +25,7 @@ public class SysLoginController {
     /**
      * 登录方法
      */
+    @SaIgnore   //过滤Sa-Token登录检查
     @PostMapping("/login")
     public R<Map<String ,Object>> login(@RequestBody LoginBody loginBody) {
         Map<String ,Object> ajax = new HashMap<>();

@@ -1,10 +1,14 @@
 package com.lemon.system.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lemon.common.constant.UserConstant;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.domain.model.LoginBody;
+import com.lemon.common.core.domain.model.LoginUser;
+import com.lemon.common.enums.DeviceType;
+import com.lemon.common.helper.LoginHelper;
 import com.lemon.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +34,27 @@ public class SysLoginService {
         SysUser user = loadUserByUserName(loginBody.getUsername());
 
         if (user.getPassword().equals(loginBody.getPassword())) {
-            //模拟token
-            return "123456";
+            //构建 loginUser，用来生成token
+            LoginUser loginUser = buildLoginUser(user);
+            //生成token
+            LoginHelper.loginByDevice(loginUser, DeviceType.PC);
         }
 
-        return null;
+        //通过sa-token获取当前对话token值
+        return StpUtil.getTokenValue();
+    }
+
+    /**
+     * 构建登录用户
+     */
+    private LoginUser buildLoginUser(SysUser user) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUserId(user.getUserId());
+        loginUser.setDeptId(user.getDeptId());
+        loginUser.setUsername(user.getUserName());
+        loginUser.setUserType(user.getUserType());
+
+        return loginUser;
     }
 
     /**
