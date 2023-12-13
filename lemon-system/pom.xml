@@ -21,6 +21,10 @@
             <groupId>com.lemon</groupId>
             <artifactId>lemon-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lemon</groupId>
+            <artifactId>lemon-framework</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

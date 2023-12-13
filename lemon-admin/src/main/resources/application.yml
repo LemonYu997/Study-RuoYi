@@ -36,6 +36,20 @@ user:
     # 密码锁定时间（默认10分钟）
     lockTime: 10
 
+# 验证码生成配置
+captcha:
+  # 是否生成
+  enabled: false
+  # 页面 <参数设置> 可开启关闭 验证码校验
+  # 验证码类型 math 数组计算 char 字符验证
+  type: MATH
+  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
+  category: CIRCLE
+  # 数字验证码位数
+  numberLength: 1
+  # 字符验证码长度
+  charLength: 4
+
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:

@@ -2,6 +2,7 @@ package com.lemon.framework.exception;
 
 import com.lemon.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -32,5 +33,15 @@ public class GlobalExceptionHandler {
         String uri = request.getRequestURI();
         log.error("请求地址'{}'，发生未知异常", uri, e);
         return R.fail(e.getMessage());
+    }
+
+    /**
+     * 处理自定义参数校验异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
+        String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        return R.fail(message);
     }
 }

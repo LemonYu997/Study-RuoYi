@@ -14,14 +14,14 @@ public class LoginBody {
     /**
      * 用户名
      */
-    @NotBlank
+    @NotBlank(message = "{user.username.not.blank}")
     @Length(min = UserConstant.USERNAME_MIN_LENGTH, max = UserConstant.USERNAME_MAX_LENGTH)
     private String username;
 
     /**
      * 密码
      */
-    @NotBlank
+    @NotBlank(message = "{user.password.not.blank}")
     @Length(min = UserConstant.PASSWORD_MIN_LENGTH, max = UserConstant.PASSWORD_MAX_LENGTH)
     private String password;
 
@@ -31,7 +31,7 @@ public class LoginBody {
     private String code;
 
     /**
-     * 唯一标识
+     * 验证码唯一标识
      */
     private String uuid;
 }

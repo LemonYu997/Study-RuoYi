@@ -11,9 +11,13 @@ import com.lemon.common.core.domain.model.LoginBody;
 import com.lemon.common.core.domain.model.LoginUser;
 import com.lemon.common.enums.DeviceType;
 import com.lemon.common.enums.LoginType;
+import com.lemon.common.exception.user.CaptchaErrorException;
+import com.lemon.common.exception.user.CaptchaExpireException;
 import com.lemon.common.exception.user.UserException;
 import com.lemon.common.helper.LoginHelper;
+import com.lemon.common.utils.StringUtils;
 import com.lemon.common.utils.redis.RedisUtils;
+import com.lemon.framework.config.properties.CaptchaProperties;
 import com.lemon.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +46,21 @@ public class SysLoginService {
     @Value("${user.password.lockTime}")
     private Integer lockTime;
 
+    /**
+     * 验证码相关配置，详见 application.yml 中 captcha 配置项
+     */
+    private final CaptchaProperties captchaProperties;
+
     private final SysUserMapper userMapper;
 
     /**
      * 登录
      */
     public String login(LoginBody loginBody) {
-        //TODO 验证码
+        //验证码，通过开关确定是否开启校验
+        if (captchaProperties.getEnabled()) {
+            validateCaptcha(loginBody);
+        }
 
         //根据 username 查询
         SysUser user = loadUserByUserName(loginBody.getUsername());
@@ -61,6 +73,27 @@ public class SysLoginService {
 
         //通过sa-token获取当前对话token值
         return StpUtil.getTokenValue();
+    }
+
+    /**
+     * 验证码校验
+     */
+    private void validateCaptcha(LoginBody loginBody) {
+        // redis中存储验证码的 key，命名为 captcha_codes: uuid (生成验证码时的唯一标识)
+        String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(loginBody.getUuid(), "");
+        // 从redis中获取验证码
+        String captcha = RedisUtils.getCacheObject(verifyKey);
+        // 验证码使用之后即销毁
+        RedisUtils.deleteObject(verifyKey);
+
+        //如果验证码不存在，说明已过期，返回提示
+        if (captcha == null) {
+            throw new CaptchaExpireException();
+        }
+        // 验证码不一致，返回验证码错误提示，不考虑大小写
+        if (!captcha.equalsIgnoreCase(loginBody.getCode())) {
+            throw new CaptchaErrorException();
+        }
     }
 
     /**

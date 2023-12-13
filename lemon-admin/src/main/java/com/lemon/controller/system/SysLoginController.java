@@ -6,6 +6,7 @@ import com.lemon.common.core.domain.R;
 import com.lemon.common.core.domain.model.LoginBody;
 import com.lemon.system.service.SysLoginService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 /**
  * 登录验证
+ * 注解 @Validated，开启请求参数注解校验
  */
 @RequiredArgsConstructor
 @RestController
@@ -27,7 +29,7 @@ public class SysLoginController {
      */
     @SaIgnore   //过滤Sa-Token登录检查
     @PostMapping("/login")
-    public R<Map<String ,Object>> login(@RequestBody LoginBody loginBody) {
+    public R<Map<String ,Object>> login(@Validated @RequestBody LoginBody loginBody) {
         Map<String ,Object> ajax = new HashMap<>();
         //生成token
         String token = loginService.login(loginBody);
