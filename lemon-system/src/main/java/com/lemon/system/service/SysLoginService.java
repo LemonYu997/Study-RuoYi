@@ -8,6 +8,8 @@ import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.domain.model.LoginBody;
 import com.lemon.common.core.domain.model.LoginUser;
 import com.lemon.common.enums.DeviceType;
+import com.lemon.common.enums.LoginType;
+import com.lemon.common.exception.user.UserException;
 import com.lemon.common.helper.LoginHelper;
 import com.lemon.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +35,23 @@ public class SysLoginService {
         //根据 username 查询
         SysUser user = loadUserByUserName(loginBody.getUsername());
 
-        if (user.getPassword().equals(loginBody.getPassword())) {
-            //构建 loginUser，用来生成token
-            LoginUser loginUser = buildLoginUser(user);
-            //生成token
-            LoginHelper.loginByDevice(loginUser, DeviceType.PC);
-        }
+        checkLogin(LoginType.PASSWORD, loginBody, user);
+        //构建 loginUser，用来生成token
+        LoginUser loginUser = buildLoginUser(user);
+        //生成token
+        LoginHelper.loginByDevice(loginUser, DeviceType.PC);
 
         //通过sa-token获取当前对话token值
         return StpUtil.getTokenValue();
+    }
+
+    /**
+     * 登录校验
+     */
+    private void checkLogin(LoginType loginType, LoginBody loginBody, SysUser user) {
+        if (!user.getPassword().equals(loginBody.getPassword())) {
+            throw new UserException("user.password.not.match", loginBody.getUsername());
+        }
     }
 
     /**
@@ -68,10 +78,10 @@ public class SysLoginService {
 
         if (ObjectUtil.isNull(sysUser)) {
             log.info("登录用户：{} 不存在", username);
-            return null;
+            throw new UserException("user.not.exists", username);
         } else if (UserConstant.EXCEPTION.equals(sysUser.getStatus())) {
             log.info("登录用户：{} 已被停用", username);
-            return null;
+            throw new UserException("user.blocked", username);
         }
 
         //返回完整的用户信息
