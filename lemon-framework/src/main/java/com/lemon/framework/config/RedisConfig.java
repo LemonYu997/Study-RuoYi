@@ -1,7 +1,6 @@
 package com.lemon.framework.config;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lemon.framework.config.properties.RedissonProperties;
 import com.lemon.framework.handler.KeyPrefixHandler;
 import lombok.extern.slf4j.Slf4j;

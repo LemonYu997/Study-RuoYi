@@ -3,6 +3,8 @@ package com.lemon.system.service;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lemon.common.constant.CacheConstants;
+import com.lemon.common.constant.Constants;
 import com.lemon.common.constant.UserConstant;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.domain.model.LoginBody;
@@ -11,10 +13,14 @@ import com.lemon.common.enums.DeviceType;
 import com.lemon.common.enums.LoginType;
 import com.lemon.common.exception.user.UserException;
 import com.lemon.common.helper.LoginHelper;
+import com.lemon.common.utils.redis.RedisUtils;
 import com.lemon.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 /**
  * 登录校验方法
@@ -23,6 +29,18 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class SysLoginService {
+
+    /**
+     * 登录最大重试次数，见 application.yml 中相关配置项
+     */
+    @Value("${user.password.maxRetryCount}")
+    private Integer maxRetryCount;
+
+    /**
+     * 锁定时间，见 application.yml 中相关配置项
+     */
+    @Value("${user.password.lockTime}")
+    private Integer lockTime;
 
     private final SysUserMapper userMapper;
 
@@ -47,11 +65,37 @@ public class SysLoginService {
 
     /**
      * 登录校验
+     * 记录登录错误次数
      */
     private void checkLogin(LoginType loginType, LoginBody loginBody, SysUser user) {
-        if (!user.getPassword().equals(loginBody.getPassword())) {
-            throw new UserException("user.password.not.match", loginBody.getUsername());
+        String username = loginBody.getUsername();
+        //redis 的 key ， 由前缀名 pwd_err_cnt: username 组成
+        String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
+        String loginFail = Constants.LOGIN_FAIL;    //Error
+
+        // 获取用户登录错误的次数，默认为 0
+        int errorNumber = ObjectUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
+        // 超出最大登录次数，则拒绝登录，此时即使密码正确也无法登录
+        if (errorNumber >= maxRetryCount) {
+            throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
+
+        //登陆失败
+        if (!user.getPassword().equals(loginBody.getPassword())) {
+            // 错误次数 + 1，并在缓存中更新
+            errorNumber++;
+            RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
+            // 达到规定错误次数 则锁定登录
+            if (errorNumber >= maxRetryCount) {
+                throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
+            } else {
+                // 未达到规定错误次数
+                throw new UserException(loginType.getRetryLimitCount(), errorNumber);
+            }
+        }
+
+        // 登录成功，清空错误次数
+        RedisUtils.deleteObject(errorKey);
     }
 
     /**
