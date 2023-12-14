@@ -47,7 +47,7 @@ public class BaseEntity implements Serializable {
      * 更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)    //新增和修改时时更新
-    private String updateTime;
+    private Date updateTime;
 
     /**
      * 请求参数

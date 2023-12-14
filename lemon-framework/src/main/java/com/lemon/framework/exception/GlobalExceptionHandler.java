@@ -1,6 +1,8 @@
 package com.lemon.framework.exception;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.lemon.common.core.domain.R;
+import com.lemon.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,5 +45,16 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
         return R.fail(message);
+    }
+
+    /**
+     * 处理业务异常
+     */
+    @ExceptionHandler(ServiceException.class)
+    public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
+        log.error(e.getMessage());
+        int code = e.getCode();
+        //返回业务异常自定义的错误代码和提示信息
+        return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }
 }

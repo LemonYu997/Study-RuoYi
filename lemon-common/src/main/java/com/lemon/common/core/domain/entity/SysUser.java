@@ -1,10 +1,6 @@
 package com.lemon.common.core.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.lemon.common.constant.UserConstant;
+import com.baomidou.mybatisplus.annotation.*;
 import com.lemon.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +20,7 @@ public class SysUser extends BaseEntity {
     /**
      * 用户id
      */
-    @TableField(value = "user_id")
+    @TableId(value = "user_id")
     private Long userId;
 
     /**
