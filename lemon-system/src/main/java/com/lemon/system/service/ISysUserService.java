@@ -1,6 +1,8 @@
 package com.lemon.system.service;
 
 import com.lemon.common.core.domain.entity.SysUser;
+import com.lemon.common.core.page.PageQuery;
+import com.lemon.common.core.page.TableDataInfo;
 
 public interface ISysUserService {
     /**
@@ -58,4 +60,9 @@ public interface ISysUserService {
      * @return 结果
      */
     int deleteUserByIds(Long[] userIds);
+
+    /**
+     * 分页查询
+     */
+    TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery);
 }

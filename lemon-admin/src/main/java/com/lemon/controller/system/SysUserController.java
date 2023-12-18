@@ -4,6 +4,8 @@ import cn.dev33.satoken.secure.BCrypt;
 import com.lemon.common.core.controller.BaseController;
 import com.lemon.common.core.domain.R;
 import com.lemon.common.core.domain.entity.SysUser;
+import com.lemon.common.core.page.PageQuery;
+import com.lemon.common.core.page.TableDataInfo;
 import com.lemon.common.utils.StringUtils;
 import com.lemon.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,15 @@ import org.springframework.web.bind.annotation.*;
 public class SysUserController extends BaseController {
 
     private final ISysUserService userService;
+
+    /**
+     * 分页获取用户列表
+     */
+    @GetMapping("/list")
+    public TableDataInfo<SysUser> list(SysUser user, PageQuery pageQuery) {
+        return userService.selectPageUserList(user, pageQuery);
+    }
+
 
     /**
      * 根据用户编号获取详细信息

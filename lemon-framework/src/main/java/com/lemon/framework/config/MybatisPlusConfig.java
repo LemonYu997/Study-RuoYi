@@ -4,6 +4,8 @@ import cn.hutool.core.net.NetUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.lemon.framework.handler.CreateAndUpdateMetaObjectHandler;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,31 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @MapperScan("${mybatis-plus.mapperPackage}")    //包扫描
 public class MybatisPlusConfig {
+
+    /**
+     * 插件配置
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // 分页插件 注意多个插件使用时，需要将分页插件放在最后边
+        interceptor.addInnerInterceptor(paginationInnerInterceptor());
+
+        return interceptor;
+    }
+
+    /**
+     * 分页插件
+     */
+    public PaginationInnerInterceptor paginationInnerInterceptor() {
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
+        // 设置最大单页限制数量，默认 500 条，-1 不受限制
+        paginationInnerInterceptor.setMaxLimit(-1L);
+        // 分页合理化 溢出总页数后会进行处理，即使用第 1 页
+        paginationInnerInterceptor.setOverflow(true);
+        return paginationInnerInterceptor;
+    }
+
     /**
      * 配置主键id的自动生成策略
      * 使用网卡信息绑定雪花生成器，防止分布式雪花id重复

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
+    //分隔符
     public static final String SEPARATOR = ",";
 
     /**

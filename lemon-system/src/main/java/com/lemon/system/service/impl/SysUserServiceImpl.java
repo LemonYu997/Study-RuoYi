@@ -1,8 +1,16 @@
 package com.lemon.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lemon.common.constant.UserConstant;
 import com.lemon.common.core.domain.entity.SysUser;
+import com.lemon.common.core.page.PageQuery;
+import com.lemon.common.core.page.TableDataInfo;
 import com.lemon.system.mapper.SysUserMapper;
 import com.lemon.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理 业务层
@@ -22,6 +31,33 @@ import java.util.List;
 public class SysUserServiceImpl implements ISysUserService {
 
     private final SysUserMapper userMapper;
+
+    /**
+     * 分页查询
+     */
+    @Override
+    public TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery) {
+        Page<SysUser> page = userMapper.selectPageUserList(pageQuery.build(), buildQueryWrapper(user));
+        return TableDataInfo.build(page);
+    }
+
+    /**
+     * 构建条件查询
+     */
+    private Wrapper<SysUser> buildQueryWrapper(SysUser user) {
+        Map<String, Object> params = user.getParams();
+        QueryWrapper<SysUser> wrapper = Wrappers.query();
+        wrapper.eq("u.del_flag", UserConstant.USER_NORMAL)
+            .eq(ObjectUtil.isNotNull(user.getUserId()), "u.user_id", user.getUserId())
+            .like(StringUtils.isNotBlank(user.getUserName()), "u.user_name", user.getUserName())
+            .eq(StringUtils.isNotBlank(user.getStatus()), "u.status", user.getStatus())
+            .like(StringUtils.isNotBlank(user.getPhonenumber()), "u.phonenumber", user.getPhonenumber())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                "u.create_time", params.get("beginTime"), params.get("endTime"));
+        //todo 部门条件
+
+        return wrapper;
+    }
 
     /**
      * 根据id查询用户信息
@@ -70,6 +106,7 @@ public class SysUserServiceImpl implements ISysUserService {
         List<Long> list = Arrays.asList(userIds);
         return userMapper.deleteBatchIds(list);
     }
+
 
     /**
      * 校验用户名称是否唯一

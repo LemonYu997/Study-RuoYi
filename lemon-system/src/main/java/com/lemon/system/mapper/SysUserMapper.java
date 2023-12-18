@@ -1,7 +1,11 @@
 package com.lemon.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.mapper.BaseMapperPlus;
+import org.apache.ibatis.annotations.Param;
 
 public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, SysUser> {
     /**
@@ -19,4 +23,11 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @return 用户对象信息
      */
     SysUser selectUserById(Long userId);
+
+    /**
+     * 条件分页查询
+     * @param page 分页条件
+     * @param queryWrapper 查询条件
+     */
+    Page<SysUser> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
 }
