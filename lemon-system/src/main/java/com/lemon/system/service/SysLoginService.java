@@ -1,12 +1,14 @@
 package com.lemon.system.service;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lemon.common.constant.CacheConstants;
 import com.lemon.common.constant.Constants;
 import com.lemon.common.constant.UserConstant;
 import com.lemon.common.core.domain.entity.SysUser;
+import com.lemon.common.core.domain.event.LoginInfoEvent;
 import com.lemon.common.core.domain.model.LoginBody;
 import com.lemon.common.core.domain.model.LoginUser;
 import com.lemon.common.enums.DeviceType;
@@ -15,8 +17,11 @@ import com.lemon.common.exception.user.CaptchaErrorException;
 import com.lemon.common.exception.user.CaptchaExpireException;
 import com.lemon.common.exception.user.UserException;
 import com.lemon.common.helper.LoginHelper;
+import com.lemon.common.utils.MessageUtils;
+import com.lemon.common.utils.ServletUtils;
 import com.lemon.common.utils.StringUtils;
 import com.lemon.common.utils.redis.RedisUtils;
+import com.lemon.common.utils.spring.SpringUtils;
 import com.lemon.framework.config.properties.CaptchaProperties;
 import com.lemon.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Date;
 
 /**
  * 登录校验方法
@@ -71,8 +77,45 @@ public class SysLoginService {
         //生成token
         LoginHelper.loginByDevice(loginUser, DeviceType.PC);
 
+        //记录登录日志
+        recordLoginInfo(loginBody.getUsername(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success"));
+        //更新用户表登录信息
+        updateUserLogin(user.getUserId(), loginBody.getUsername());
+
         //通过sa-token获取当前对话token值
         return StpUtil.getTokenValue();
+    }
+
+    /**
+     * 更新用户表登录信息
+     * @param userId 用户id
+     * @param username 用户名
+     */
+    private void updateUserLogin(Long userId, String username) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userId);
+        sysUser.setUpdateBy(username);
+        sysUser.setLoginIp(ServletUtils.getClientIP());
+        sysUser.setLoginDate(new Date());
+
+        userMapper.updateById(sysUser);
+    }
+
+    /**
+     * 记录登录日志
+     * @param username 用户名
+     * @param status 状态
+     * @param message 消息内容
+     */
+    private void recordLoginInfo(String username, String status, String message) {
+        LoginInfoEvent loginInfoEvent = new LoginInfoEvent();
+        loginInfoEvent.setUsername(username);
+        loginInfoEvent.setStatus(status);
+        loginInfoEvent.setMessage(message);
+        //获取请求
+        loginInfoEvent.setRequest(ServletUtils.getRequest());
+        //发送事件  会被 SysLoginInfoServiceImpl 中的 recordLoginInfo 方法处理
+        SpringUtils.getApplicationContext().publishEvent(loginInfoEvent);
     }
 
     /**
@@ -88,10 +131,12 @@ public class SysLoginService {
 
         //如果验证码不存在，说明已过期，返回提示
         if (captcha == null) {
+            recordLoginInfo(loginBody.getUsername(), Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         // 验证码不一致，返回验证码错误提示，不考虑大小写
         if (!captcha.equalsIgnoreCase(loginBody.getCode())) {
+            recordLoginInfo(loginBody.getUsername(), Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaErrorException();
         }
     }
@@ -110,6 +155,7 @@ public class SysLoginService {
         int errorNumber = ObjectUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
         // 超出最大登录次数，则拒绝登录，此时即使密码正确也无法登录
         if (errorNumber >= maxRetryCount) {
+            recordLoginInfo(loginBody.getUsername(), loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
             throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
 
@@ -120,9 +166,11 @@ public class SysLoginService {
             RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
             // 达到规定错误次数 则锁定登录
             if (errorNumber >= maxRetryCount) {
+                recordLoginInfo(loginBody.getUsername(), loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
                 throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
             } else {
                 // 未达到规定错误次数
+                recordLoginInfo(loginBody.getUsername(), loginFail, MessageUtils.message(loginType.getRetryLimitCount(), maxRetryCount, errorNumber));
                 throw new UserException(loginType.getRetryLimitCount(), errorNumber);
             }
         }

@@ -67,6 +67,9 @@
         <lock4j.version>2.2.3</lock4j.version>
         <hutool.version>5.8.22</hutool.version>
         <satoken.version>1.37.0</satoken.version>
+
+        <!-- 离线IP地址定位库 -->
+        <ip2region.version>2.7.0</ip2region.version>
     </properties>
 
     <!--  依赖管理  -->
@@ -169,6 +172,13 @@
                 <groupId>com.lemon</groupId>
                 <artifactId>lemon-system</artifactId>
                 <version>${lemon-ruoyi.version}</version>
+            </dependency>
+
+            <!-- 离线IP地址定位库 ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
