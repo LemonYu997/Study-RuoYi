@@ -1,5 +1,6 @@
 package com.lemon.system.service;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -211,5 +212,17 @@ public class SysLoginService {
 
         //返回完整的用户信息
         return userMapper.selectUserByUsername(username);
+    }
+
+    /**
+     * 退出登录
+     */
+    public void logout() {
+        try {
+            LoginUser loginUser = LoginHelper.getLoginUser();
+            StpUtil.logout();
+            recordLoginInfo(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
+        } catch (NotLoginException e) {
+        }
     }
 }
