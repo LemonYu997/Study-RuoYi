@@ -21,6 +21,13 @@ public class RedisUtils {
     private static final RedissonClient CLIENT = SpringUtils.getBean(RedissonClient.class);
 
     /**
+     * 获取客户端实例
+     */
+    public static RedissonClient getClient() {
+        return CLIENT;
+    }
+
+    /**
      * 获得缓存的基本对象。
      *
      * @param key 缓存键值

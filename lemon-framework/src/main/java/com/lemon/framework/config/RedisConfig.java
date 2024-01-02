@@ -1,8 +1,10 @@
 package com.lemon.framework.config;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lemon.framework.config.properties.RedissonProperties;
 import com.lemon.framework.handler.KeyPrefixHandler;
+import com.lemon.framework.manager.PlusSpringCacheManager;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
@@ -21,20 +23,24 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@EnableCaching
+@EnableCaching  //开启缓存
 @EnableConfigurationProperties(RedissonProperties.class)
 public class RedisConfig {
 
     @Autowired
     private RedissonProperties redissonProperties;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * 自定义缓存管理器 整合spring-cache
      */
     @Bean
     public CacheManager cacheManager() {
-        //TODO 之后需要使用自定义缓存容器
-        return new ConcurrentMapCacheManager();
+//        return new ConcurrentMapCacheManager();
+        //使用自定义缓存容器
+        return new PlusSpringCacheManager();
     }
 
     /**
@@ -49,7 +55,7 @@ public class RedisConfig {
                 //Netty线程池数量,默认值 = 当前处理核数量 * 2
                 .setNettyThreads(redissonProperties.getNettyThreads())
                 //使用 Jackson 作为序列化方式
-                .setCodec(new JsonJacksonCodec());
+                .setCodec(new JsonJacksonCodec(objectMapper));
 
             //获取自定义的单机配置 如果有就使用
             RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
