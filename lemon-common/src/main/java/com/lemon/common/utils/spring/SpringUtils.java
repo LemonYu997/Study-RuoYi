@@ -1,6 +1,7 @@
 package com.lemon.common.utils.spring;
 
 import cn.hutool.extra.spring.SpringUtil;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,4 +10,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public final class SpringUtils extends SpringUtil {
+    /**
+     * 获取 spring 上下文
+     */
+    public static ApplicationContext context() {
+        return getApplicationContext();
+    }
 }

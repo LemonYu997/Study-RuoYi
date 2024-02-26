@@ -1,10 +1,12 @@
 package com.lemon.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.lemon.common.annotation.Log;
 import com.lemon.common.core.controller.BaseController;
 import com.lemon.common.core.domain.R;
 import com.lemon.common.core.page.PageQuery;
 import com.lemon.common.core.page.TableDataInfo;
+import com.lemon.common.enums.BusinessType;
 import com.lemon.system.domain.SysConfig;
 import com.lemon.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class SysConfigController extends BaseController {
      * 新增参数配置
      */
     @PostMapping
+    @Log(title = "参数管理", businessType = BusinessType.INSERT)
     public R<Void> add(@Validated @RequestBody SysConfig config) {
         if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
@@ -61,6 +64,7 @@ public class SysConfigController extends BaseController {
      * 修改参数配置
      */
     @PutMapping
+    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     public R<Void> edit(@Validated @RequestBody SysConfig config) {
         if (!configService.checkConfigKeyUnique(config)) {
             return R.fail("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
@@ -73,6 +77,7 @@ public class SysConfigController extends BaseController {
      * 根据参数键名修改参数配置
      */
     @PutMapping("/updateByKey")
+    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
     public R<Void> updateByKey(@RequestBody SysConfig config) {
         configService.updateConfig(config);
         return R.ok();
@@ -82,6 +87,7 @@ public class SysConfigController extends BaseController {
      * 删除参数配置
      */
     @DeleteMapping("/{configIds}")
+    @Log(title = "参数管理", businessType = BusinessType.DELETE)
     public R<Void> remove(@PathVariable Long[] configIds) {
         configService.deleteConfigByIds(configIds);
         return R.ok();
@@ -91,6 +97,7 @@ public class SysConfigController extends BaseController {
      * 刷新参数缓存
      */
     @DeleteMapping("/refreshCache")
+    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
     public R<Void> refreshCache() {
         configService.resetConfigCache();
         return R.ok();

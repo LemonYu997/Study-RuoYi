@@ -1,11 +1,13 @@
 package com.lemon.controller.system;
 
 import cn.dev33.satoken.secure.BCrypt;
+import com.lemon.common.annotation.Log;
 import com.lemon.common.core.controller.BaseController;
 import com.lemon.common.core.domain.R;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.page.PageQuery;
 import com.lemon.common.core.page.TableDataInfo;
+import com.lemon.common.enums.BusinessType;
 import com.lemon.common.utils.StringUtils;
 import com.lemon.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,7 @@ public class SysUserController extends BaseController {
      * 新增用户
      */
     @PostMapping
+    @Log(title = "用户管理", businessType = BusinessType.INSERT)
     public R<Void> add(@RequestBody SysUser user) {
         //重复账号校验、重复手机号校验、重复邮箱校验
         if (!userService.checkUserNameUnique(user)) {
@@ -64,6 +67,7 @@ public class SysUserController extends BaseController {
      * 修改用户
      */
     @PutMapping
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     public R<Void> edit(@Validated @RequestBody SysUser user) {
         if (!userService.checkUserNameUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -72,6 +76,7 @@ public class SysUserController extends BaseController {
         } else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user)) {
             return R.fail("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
+        // todo 这里不能修改密码
         return toAjax(userService.updateUser(user));
     }
 
@@ -79,6 +84,7 @@ public class SysUserController extends BaseController {
      * 删除用户
      */
     @DeleteMapping("/{userIds}")
+    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     public R<Void> remove(@PathVariable Long[] userIds) {
         return toAjax(userService.deleteUserByIds(userIds));
     }

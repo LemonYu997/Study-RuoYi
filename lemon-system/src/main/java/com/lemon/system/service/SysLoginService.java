@@ -1,6 +1,7 @@
 package com.lemon.system.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -160,8 +161,8 @@ public class SysLoginService {
             throw new UserException(loginType.getRetryLimitExceed(), maxRetryCount, lockTime);
         }
 
-        //登陆失败
-        if (!user.getPassword().equals(loginBody.getPassword())) {
+        // 密码错误，登陆失败
+        if (BCrypt.checkpw(loginBody.getPassword(), user.getPassword())) {
             // 错误次数 + 1，并在缓存中更新
             errorNumber++;
             RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));

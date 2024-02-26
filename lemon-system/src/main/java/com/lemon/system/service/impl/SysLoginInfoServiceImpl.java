@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+/**
+ * 系统访问日志情况信息
+ */
 @RequiredArgsConstructor
 @Slf4j
 @Service
