@@ -3,10 +3,7 @@ package com.lemon.common.utils.redis;
 import com.lemon.common.utils.spring.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.redisson.api.RBatch;
-import org.redisson.api.RBucket;
-import org.redisson.api.RBucketAsync;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 
 import java.time.Duration;
 
@@ -92,5 +89,15 @@ public class RedisUtils {
      */
     public static boolean deleteObject(final String key) {
         return CLIENT.getBucket(key).delete();
+    }
+
+    /**
+     * 检查redis中是否存在key
+     *
+     * @param key 键
+     */
+    public static boolean hasKey(String key) {
+        RKeys rKeys = CLIENT.getKeys();
+        return rKeys.countExists(key) > 0;
     }
 }

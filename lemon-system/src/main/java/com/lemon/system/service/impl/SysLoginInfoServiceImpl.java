@@ -2,8 +2,13 @@ package com.lemon.system.service.impl;
 
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lemon.common.constant.Constants;
 import com.lemon.common.core.domain.event.LoginInfoEvent;
+import com.lemon.common.core.page.PageQuery;
+import com.lemon.common.core.page.TableDataInfo;
 import com.lemon.common.utils.ServletUtils;
 import com.lemon.common.utils.StringUtils;
 import com.lemon.common.utils.ip.AddressUtils;
@@ -18,7 +23,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 系统访问日志情况信息
@@ -87,6 +94,43 @@ public class SysLoginInfoServiceImpl implements ISysLoginInfoService {
     public void insertLoginInfo(SysLoginInfo sysLoginInfo) {
         sysLoginInfo.setLoginTime(new Date());
         sysLoginInfoMapper.insert(sysLoginInfo);
+    }
+
+    /**
+     * 获取系统访问记录列表
+     */
+    @Override
+    public TableDataInfo<SysLoginInfo> selectPageLoginInfoList(SysLoginInfo loginInfo, PageQuery pageQuery) {
+        Map<String, Object> params = loginInfo.getParams();
+        LambdaQueryWrapper<SysLoginInfo> lqw = Wrappers.lambdaQuery(SysLoginInfo.class);
+        lqw.like(StringUtils.isNotBlank(loginInfo.getIpaddr()), SysLoginInfo::getIpaddr, loginInfo.getIpaddr())
+            .eq(StringUtils.isNotBlank(loginInfo.getStatus()), SysLoginInfo::getStatus, loginInfo.getStatus())
+            .like(StringUtils.isNotBlank(loginInfo.getUserName()), SysLoginInfo::getUserName, loginInfo.getUserName())
+            .between(params.get("beginTime") != null && params.get("endTime") != null,
+                SysLoginInfo::getLoginTime, params.get("beginTime"), params.get("endTime"));
+        // 默认排序
+        if (StringUtils.isBlank(pageQuery.getOrderByColumn())) {
+            pageQuery.setOrderByColumn("info_id");
+            pageQuery.setIsAsc("desc");
+        }
+        Page<SysLoginInfo> page = sysLoginInfoMapper.selectPage(pageQuery.build(), lqw);
+        return TableDataInfo.build(page);
+    }
+
+    /**
+     * 清空系统访问记录
+     */
+    @Override
+    public void cleanLoginInfo() {
+        sysLoginInfoMapper.delete(Wrappers.lambdaQuery());
+    }
+
+    /**
+     * 批量删除系统登录日志
+     */
+    @Override
+    public int deleteLoginInfoByIds(Long[] infoIds) {
+        return sysLoginInfoMapper.deleteBatchIds(Arrays.asList(infoIds));
     }
 
     /**
