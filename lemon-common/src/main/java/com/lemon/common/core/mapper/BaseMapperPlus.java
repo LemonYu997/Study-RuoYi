@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 自定义 Mapper 增强
@@ -29,4 +28,7 @@ public interface BaseMapperPlus<M, T, V> extends BaseMapper<T> {
         return Db.saveOrUpdateBatch(entityList);
     }
 
+    default boolean updateBatchById(Collection<T> entityList) {
+        return Db.updateBatchById(entityList);
+    }
 }

@@ -1,5 +1,6 @@
 package com.lemon.common.core.domain;
 
+import com.lemon.common.constant.HttpStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -70,4 +71,26 @@ public class R<T> implements Serializable {
     public static <T> R<T> fail(int code, String msg) {
         return restResult(null, code, msg);
     }
+
+    /**
+     * 返回警告消息
+     *
+     * @param msg 返回内容
+     * @return 警告消息
+     */
+    public static <T> R<T> warn(String msg) {
+        return restResult(null, HttpStatus.WARN, msg);
+    }
+
+    /**
+     * 返回警告消息
+     *
+     * @param msg 返回内容
+     * @param data 数据对象
+     * @return 警告消息
+     */
+    public static <T> R<T> warn(String msg, T data) {
+        return restResult(data, HttpStatus.WARN, msg);
+    }
+
 }
