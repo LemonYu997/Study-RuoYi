@@ -1,9 +1,11 @@
 package com.lemon.common.core.domain.model;
 
+import com.lemon.common.core.domain.dto.RoleDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 登录用户身份权限
@@ -72,4 +74,9 @@ public class LoginUser implements Serializable {
      * 操作系统
      */
     private String os;
+
+    /**
+     * 角色对象
+     */
+    private List<RoleDTO> roles;
 }

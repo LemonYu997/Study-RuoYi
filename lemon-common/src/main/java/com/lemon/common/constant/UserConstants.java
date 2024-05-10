@@ -3,7 +3,7 @@ package com.lemon.common.constant;
 /**
  * 用户常量信息
  */
-public interface UserConstant {
+public interface UserConstants {
     /**
      * 平台内系统用户的唯一标志
      */

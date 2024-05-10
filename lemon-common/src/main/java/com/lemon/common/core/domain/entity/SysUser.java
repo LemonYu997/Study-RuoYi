@@ -106,4 +106,9 @@ public class SysUser extends BaseEntity {
      */
     private String remark;
 
+    /**
+     * 数据权限 当前角色ID
+     */
+    @TableField(exist = false)
+    private Long roleId;
 }

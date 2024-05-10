@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lemon.common.constant.CacheNames;
-import com.lemon.common.constant.UserConstant;
+import com.lemon.common.constant.UserConstants;
 import com.lemon.common.core.page.PageQuery;
 import com.lemon.common.core.page.TableDataInfo;
 import com.lemon.common.exception.ServiceException;
@@ -139,7 +139,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public void deleteConfigByIds(Long[] configIds) {
         for (Long configId : configIds) {
             SysConfig config = selectConfigById(configId);
-            if (StringUtils.equals(UserConstant.YES, config.getConfigType())) {
+            if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除", config.getConfigKey()));
             }
             //从缓存中剔除

@@ -65,4 +65,14 @@ public interface ISysUserService {
      * 分页查询
      */
     TableDataInfo<SysUser> selectPageUserList(SysUser user, PageQuery pageQuery);
+
+    /**
+     * 根据条件分页查询已分配用户角色列表
+     */
+    TableDataInfo<SysUser> selectAllocatedList(SysUser user, PageQuery pageQuery);
+
+    /**
+     * 根据条件分页查询未分配用户角色列表
+     */
+    TableDataInfo<SysUser> selectUnallocatedList(SysUser user, PageQuery pageQuery);
 }

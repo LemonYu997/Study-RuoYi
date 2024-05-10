@@ -1,6 +1,7 @@
 package com.lemon.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lemon.common.core.domain.entity.SysUser;
@@ -30,4 +31,14 @@ public interface SysUserMapper extends BaseMapperPlus<SysUserMapper, SysUser, Sy
      * @param queryWrapper 查询条件
      */
     Page<SysUser> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
+    /**
+     * 根据条件分页查询已配用户角色列表
+     */
+    Page<SysUser> selectAllocatedList(@Param("page") Page<Object> build, @Param(Constants.WRAPPER) QueryWrapper<SysUser> qw);
+
+    /**
+     * 根据条件分页查询未分配用户角色列表
+     */
+    Page<SysUser> selectUnallocatedList(Page<Object> build, QueryWrapper<SysUser> wrapper);
 }

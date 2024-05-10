@@ -1,6 +1,6 @@
 package com.lemon.common.core.domain.model;
 
-import com.lemon.common.constant.UserConstant;
+import com.lemon.common.constant.UserConstants;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -15,14 +15,14 @@ public class LoginBody {
      * 用户名
      */
     @NotBlank(message = "{user.username.not.blank}")
-    @Length(min = UserConstant.USERNAME_MIN_LENGTH, max = UserConstant.USERNAME_MAX_LENGTH)
+    @Length(min = UserConstants.USERNAME_MIN_LENGTH, max = UserConstants.USERNAME_MAX_LENGTH)
     private String username;
 
     /**
      * 密码
      */
     @NotBlank(message = "{user.password.not.blank}")
-    @Length(min = UserConstant.PASSWORD_MIN_LENGTH, max = UserConstant.PASSWORD_MAX_LENGTH)
+    @Length(min = UserConstants.PASSWORD_MIN_LENGTH, max = UserConstants.PASSWORD_MAX_LENGTH)
     private String password;
 
     /**

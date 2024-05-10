@@ -5,7 +5,9 @@ import cn.dev33.satoken.context.model.SaStorage;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.lemon.common.constant.UserConstants;
 import com.lemon.common.core.domain.model.LoginUser;
 import com.lemon.common.enums.DeviceType;
 import lombok.AccessLevel;
@@ -53,9 +55,51 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户基于token
+     */
+    public static LoginUser getLoginUser(String token) {
+        SaSession session = StpUtil.getTokenSessionByToken(token);
+        if (ObjectUtil.isNull(session)) {
+            return null;
+        }
+        return (LoginUser) session.get(LOGIN_USER_KEY);
+    }
+
+    /**
      * 获取用户账号
      */
     public static String getUsername() {
         return getLoginUser().getUsername();
+    }
+
+    /**
+     * 获取用户 id
+     */
+    public static Long getUserId() {
+        Long userId;
+        try {
+            userId = Convert.toLong(SaHolder.getStorage().get(USER_KEY));
+            if (ObjectUtil.isNull(userId)) {
+                userId = Convert.toLong(StpUtil.getExtra(USER_KEY));
+                SaHolder.getStorage().set(USER_KEY, userId);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return userId;
+    }
+
+    /**
+     * 是否为管理员
+     */
+    public static boolean isAdmin(Long userId) {
+        return UserConstants.ADMIN_ID.equals(userId);
+    }
+
+    /**
+     * 是否为管理员
+     */
+    public static boolean isAdmin() {
+        return isAdmin(getUserId());
     }
 }

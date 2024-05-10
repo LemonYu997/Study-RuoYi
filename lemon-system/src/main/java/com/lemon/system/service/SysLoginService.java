@@ -3,18 +3,18 @@ package com.lemon.system.service;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lemon.common.constant.CacheConstants;
 import com.lemon.common.constant.Constants;
-import com.lemon.common.constant.UserConstant;
+import com.lemon.common.constant.UserConstants;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.domain.event.LoginInfoEvent;
 import com.lemon.common.core.domain.model.LoginBody;
 import com.lemon.common.core.domain.model.LoginUser;
 import com.lemon.common.enums.DeviceType;
 import com.lemon.common.enums.LoginType;
+import com.lemon.common.enums.UserStatus;
 import com.lemon.common.exception.user.CaptchaErrorException;
 import com.lemon.common.exception.user.CaptchaExpireException;
 import com.lemon.common.exception.user.UserException;
@@ -206,7 +206,7 @@ public class SysLoginService {
         if (ObjectUtil.isNull(sysUser)) {
             log.info("登录用户：{} 不存在", username);
             throw new UserException("user.not.exists", username);
-        } else if (UserConstant.EXCEPTION.equals(sysUser.getStatus())) {
+        } else if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
             log.info("登录用户：{} 已被停用", username);
             throw new UserException("user.blocked", username);
         }
