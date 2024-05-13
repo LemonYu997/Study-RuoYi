@@ -71,4 +71,19 @@ public class StreamUtils {
         // 注意此处不要使用 .toList() 新语法 因为返回的是不可变List 会导致序列化问题
         return collection.stream().filter(function).collect(Collectors.toList());
     }
+
+    /**
+     * 将collection拼接
+     *
+     * @param collection 需要转化的集合
+     * @param function   拼接方法
+     * @param delimiter  拼接符
+     * @return 拼接后的list
+     */
+    public static <E> String join(Collection<E> collection, Function<E, String> function, CharSequence delimiter) {
+        if (CollUtil.isEmpty(collection)) {
+            return StringUtils.EMPTY;
+        }
+        return collection.stream().map(function).filter(Objects::nonNull).collect(Collectors.joining(delimiter));
+    }
 }
