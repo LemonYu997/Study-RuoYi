@@ -1,6 +1,7 @@
 package com.lemon.common.core.controller;
 
 import com.lemon.common.core.domain.R;
+import com.lemon.common.helper.LoginHelper;
 
 /**
  * web层通用数据处理
@@ -23,5 +24,12 @@ public class BaseController {
      */
     protected R<Void> toAjax(boolean result) {
         return result ? R.ok() : R.fail();
+    }
+
+    /**
+     * 获取登录用户id
+     */
+    public Long getUserId() {
+        return LoginHelper.getUserId();
     }
 }
