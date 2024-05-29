@@ -1,6 +1,7 @@
 package com.lemon.common.core.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.lemon.common.constant.UserConstants;
 import com.lemon.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -111,4 +113,36 @@ public class SysUser extends BaseEntity {
      */
     @TableField(exist = false)
     private Long roleId;
+
+    /**
+     * 部门对象
+     */
+    @TableField(exist = false)
+    private SysDept dept;
+
+    /**
+     * 角色对象
+     */
+    @TableField(exist = false)
+    private List<SysRole> roles;
+
+    /**
+     * 角色组
+     */
+    @TableField(exist = false)
+    private Long[] roleIds;
+
+    /**
+     * 岗位组
+     */
+    @TableField(exist = false)
+    private Long[] postIds;
+
+    public SysUser(Long userId) {
+        this.userId = userId;
+    }
+
+    public boolean isAdmin() {
+        return UserConstants.ADMIN_ID.equals(this.userId);
+    }
 }
