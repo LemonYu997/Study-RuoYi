@@ -23,4 +23,12 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRoleMapper, SysRole, Sy
      * 根据条件分页查询角色数据
      */
     List<SysRole> selectRoleList(@Param(Constants.WRAPPER) Wrapper<SysRole> buildQueryWrapper);
+
+    /**
+     * 根据用户名查询角色
+     *
+     * @param userName 用户名
+     * @return 角色列表
+     */
+    List<SysRole> selectRolesByUserName(String userName);
 }

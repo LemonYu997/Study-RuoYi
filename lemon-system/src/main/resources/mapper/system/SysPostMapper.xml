@@ -16,4 +16,12 @@
         <result property="remark" column="remark"/>
     </resultMap>
 
+    <select id="selectPostsByUserName" resultType="com.lemon.system.domain.SysPost">
+        select p.post_id, p.post_name, p.post_code
+        from sys_post p
+            left join sys_user_post up on up.post_id = p.post_id
+            left join sys_user u on u.user_id = up.user_id
+        where u.user_name = #{userName}
+    </select>
+
 </mapper>

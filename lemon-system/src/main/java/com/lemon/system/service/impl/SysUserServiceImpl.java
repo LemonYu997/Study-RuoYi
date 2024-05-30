@@ -8,10 +8,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lemon.common.constant.UserConstants;
+import com.lemon.common.core.domain.entity.SysRole;
 import com.lemon.common.core.domain.entity.SysUser;
 import com.lemon.common.core.page.PageQuery;
 import com.lemon.common.core.page.TableDataInfo;
+import com.lemon.common.utils.StreamUtils;
 import com.lemon.common.utils.StringUtils;
+import com.lemon.system.domain.SysPost;
+import com.lemon.system.mapper.SysPostMapper;
 import com.lemon.system.mapper.SysRoleMapper;
 import com.lemon.system.mapper.SysUserMapper;
 import com.lemon.system.mapper.SysUserRoleMapper;
@@ -35,6 +39,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     private final SysUserMapper userMapper;
     private final SysRoleMapper roleMapper;
+    private final SysPostMapper postMapper;
     private final SysUserRoleMapper userRoleMapper;
 
     /**
@@ -75,6 +80,61 @@ public class SysUserServiceImpl implements ISysUserService {
             .like(StringUtils.isNotBlank(user.getPhonenumber()), "u.phonenumber", user.getPhonenumber());
         Page<SysUser> page = userMapper.selectUnallocatedList(pageQuery.build(), wrapper);
         return TableDataInfo.build(page);
+    }
+
+    /**
+     * 查询用户所属角色组
+     *
+     * @param userName 用户名
+     * @return 结果
+     */
+    @Override
+    public String selectUserRoleGroup(String userName) {
+        List<SysRole> list = roleMapper.selectRolesByUserName(userName);
+        if (CollUtil.isEmpty(list)) {
+            return StringUtils.EMPTY;
+        }
+        return StreamUtils.join(list, SysRole::getRoleName);
+    }
+
+    /**
+     * 查询用户所属岗位组
+     *
+     * @param userName 用户名
+     * @return 结果
+     */
+    @Override
+    public String selectUserPostGroup(String userName) {
+        List<SysPost> list = postMapper.selectPostsByUserName(userName);
+        if (CollUtil.isEmpty(list)) {
+            return StringUtils.EMPTY;
+        }
+        return StreamUtils.join(list, SysPost::getPostName);
+    }
+
+    /**
+     * 修改用户基本信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public int updateUserProfile(SysUser user) {
+        return userMapper.updateById(user);
+    }
+
+    /**
+     * 重置用户密码
+     *
+     * @param userName 用户名
+     * @param password 密码
+     * @return 结果
+     */
+    @Override
+    public int resetUserPwd(String userName, String password) {
+        return userMapper.update(null, Wrappers.lambdaUpdate(SysUser.class)
+            .set(SysUser::getPassword, password)
+            .eq(SysUser::getUserName, userName));
     }
 
     /**

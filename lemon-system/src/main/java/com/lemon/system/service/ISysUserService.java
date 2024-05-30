@@ -75,4 +75,37 @@ public interface ISysUserService {
      * 根据条件分页查询未分配用户角色列表
      */
     TableDataInfo<SysUser> selectUnallocatedList(SysUser user, PageQuery pageQuery);
+
+    /**
+     * 查询用户所属角色组
+     *
+     * @param userName 用户名
+     * @return 结果
+     */
+    String selectUserRoleGroup(String userName);
+
+    /**
+     * 根据用户ID查询用户所属岗位组
+     *
+     * @param userName 用户名
+     * @return 结果
+     */
+    String selectUserPostGroup(String userName);
+
+    /**
+     * 修改用户基本信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    int updateUserProfile(SysUser user);
+
+    /**
+     * 重置用户密码
+     *
+     * @param userName 用户名
+     * @param password 密码
+     * @return 结果
+     */
+    int resetUserPwd(String userName, String password);
 }
