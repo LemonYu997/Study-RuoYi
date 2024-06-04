@@ -1,5 +1,6 @@
 package com.lemon.system.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -20,6 +21,7 @@ import com.lemon.system.mapper.SysDictTypeMapper;
 import com.lemon.system.service.ISysDictTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,6 +159,22 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService, DictService 
     @Override
     public List<SysDictType> selectDictTypeAll() {
         return baseMapper.selectList();
+    }
+
+    /**
+     * 根据字典类型查询字典数据
+     *
+     * @param dictType 字典类型
+     * @return 字典数据集合信息
+     */
+    @Override
+    @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
+    public List<SysDictData> selectDictDataByType(String dictType) {
+        List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType);
+        if (CollUtil.isNotEmpty(dictDatas)) {
+            return dictDatas;
+        }
+        return null;
     }
 
     /**
