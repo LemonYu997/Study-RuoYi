@@ -18,7 +18,7 @@ public interface ISysConfigService {
     /**
      * 根据参数键名查询参数值
      */
-    String selectConfigByKey(SysConfig configKey);
+    String selectConfigByKey(String configKey);
 
     /**
      * 校验参数键名是否唯一
@@ -45,4 +45,10 @@ public interface ISysConfigService {
      */
     void resetConfigCache();
 
+    /**
+     * 获取验证码开关
+     *
+     * @return true开启，false关闭
+     */
+    boolean selectCaptchaEnabled();
 }

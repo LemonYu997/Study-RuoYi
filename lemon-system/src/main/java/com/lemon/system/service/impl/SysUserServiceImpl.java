@@ -138,6 +138,19 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     /**
+     * 注册用户信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public boolean registerUser(SysUser user) {
+        user.setCreateBy(user.getUserName());
+        user.setUpdateBy(user.getUserName());
+        return userMapper.insert(user) > 0;
+    }
+
+    /**
      * 构建条件查询
      */
     private Wrapper<SysUser> buildQueryWrapper(SysUser user) {

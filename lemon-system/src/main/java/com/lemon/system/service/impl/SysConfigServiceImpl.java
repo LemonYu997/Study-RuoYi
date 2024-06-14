@@ -1,5 +1,6 @@
 package com.lemon.system.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,6 +12,7 @@ import com.lemon.common.core.page.TableDataInfo;
 import com.lemon.common.exception.ServiceException;
 import com.lemon.common.utils.StringUtils;
 import com.lemon.common.utils.redis.CacheUtils;
+import com.lemon.common.utils.spring.SpringUtils;
 import com.lemon.system.domain.SysConfig;
 import com.lemon.system.mapper.SysConfigMapper;
 import com.lemon.system.service.ISysConfigService;
@@ -72,7 +74,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * 根据参数键名查询参数值
      */
     @Override
-    public String selectConfigByKey(SysConfig configKey) {
+    public String selectConfigByKey(String configKey) {
         SysConfig retConfig = sysConfigMapper.selectOne(Wrappers.<SysConfig>lambdaQuery()
             .eq(SysConfig::getConfigKey, configKey));
         if (ObjectUtil.isNotNull(retConfig)) {
@@ -157,6 +159,20 @@ public class SysConfigServiceImpl implements ISysConfigService {
         clearConfigCache();
         // 加载参数缓存
         loadingConfigCache();
+    }
+
+    /**
+     * 获取验证码开关
+     *
+     * @return true开启，false关闭
+     */
+    @Override
+    public boolean selectCaptchaEnabled() {
+        String captchaEnabled = SpringUtils.getAopProxy(this).selectConfigByKey("sys.account.captchaEnabled");
+        if (StringUtils.isEmpty(captchaEnabled)) {
+            return true;
+        }
+        return Convert.toBool(captchaEnabled);
     }
 
     /**

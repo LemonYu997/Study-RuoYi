@@ -43,7 +43,7 @@ public class SysConfigController extends BaseController {
      * 根据参数键名查询参数值
      */
     @GetMapping("/configKey/{configKey}")
-    public R<String> getConfigKey(@PathVariable SysConfig configKey) {
+    public R<String> getConfigKey(@PathVariable String configKey) {
         return R.ok(configService.selectConfigByKey(configKey));
     }
 
