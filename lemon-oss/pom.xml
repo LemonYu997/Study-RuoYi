@@ -9,27 +9,25 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>lemon-system</artifactId>
+    <artifactId>lemon-oss</artifactId>
 
     <description>
-        system系统模块
+        OSS对象存储模块
     </description>
 
     <dependencies>
+
         <!-- 通用工具-->
         <dependency>
             <groupId>com.lemon</groupId>
             <artifactId>lemon-common</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>com.lemon</groupId>
-            <artifactId>lemon-framework</artifactId>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
-        <!-- OSS功能模块 -->
-        <dependency>
-            <groupId>com.lemon</groupId>
-            <artifactId>lemon-oss</artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>
