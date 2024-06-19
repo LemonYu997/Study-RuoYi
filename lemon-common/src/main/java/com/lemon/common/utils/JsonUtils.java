@@ -51,4 +51,15 @@ public class JsonUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static <T> T parseObject(String text, Class<T> clazz) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.readValue(text, clazz);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
